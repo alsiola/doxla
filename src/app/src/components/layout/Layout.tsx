@@ -14,7 +14,7 @@ interface LayoutProps {
 export function Layout({ manifest, theme, onToggleTheme, children }: LayoutProps) {
   return (
     <div className="min-h-screen">
-      <Header repoName={manifest.repoName} theme={theme} onToggleTheme={onToggleTheme} />
+      <Header repoName={manifest.repoName} docs={manifest.docs} theme={theme} onToggleTheme={onToggleTheme} />
       <div className="flex">
         <Sidebar docs={manifest.docs} />
         <main className="flex-1 overflow-auto">

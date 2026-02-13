@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { Search, Sun, Moon } from "lucide-react";
 import type { Theme } from "../../App";
+import type { DocFile } from "../../types/manifest";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
+import { MobileNav } from "./MobileNav";
 import logoSrc from "../../assets/logo.svg";
 
 interface HeaderProps {
   repoName: string;
+  docs: DocFile[];
   theme: Theme;
   onToggleTheme: () => void;
 }
 
-export function Header({ repoName, theme, onToggleTheme }: HeaderProps) {
+export function Header({ repoName, docs, theme, onToggleTheme }: HeaderProps) {
   const [searchInput, setSearchInput] = useState("");
 
   const handleSearch = (e: React.FormEvent) => {
@@ -22,7 +25,9 @@ export function Header({ repoName, theme, onToggleTheme }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b border-border bg-background px-6">
+    <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b border-border bg-background px-4 sm:px-6">
+      <MobileNav docs={docs} />
+
       <a href="#/" className="flex items-center gap-2 font-semibold">
         <img src={logoSrc} alt="Doxla" className="h-5 w-5 object-contain" />
         <span>{repoName}</span>
@@ -36,10 +41,10 @@ export function Header({ repoName, theme, onToggleTheme }: HeaderProps) {
             placeholder="Search docs..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="w-64 pl-9"
+            className="w-full sm:w-64 pl-9"
           />
         </div>
-        <Button type="submit" size="sm">
+        <Button type="submit" size="sm" className="hidden sm:inline-flex">
           Search
         </Button>
       </form>
