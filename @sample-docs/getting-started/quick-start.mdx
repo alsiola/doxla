@@ -1,0 +1,55 @@
+# Quick Start
+
+Get up and running with the Acme Widget Platform in under 5 minutes.
+
+<Callout type="info">
+This guide assumes you have Node.js 20+ installed. See the [full installation guide](installation.md) for detailed prerequisites.
+</Callout>
+
+## Step 1: Install the CLI
+
+```bash
+npm install -g @acme/widget-cli
+```
+
+## Step 2: Create a Project
+
+```bash
+acme init my-first-widget
+cd my-first-widget
+```
+
+## Step 3: Start Developing
+
+```bash
+acme dev
+```
+
+Your widget is now running at `http://localhost:8080`.
+
+<Callout type="warning">
+The development server auto-reloads on file changes. If you see stale responses, check that your terminal shows the reload confirmation.
+</Callout>
+
+## Step 4: Deploy
+
+When you're ready to go live:
+
+```bash
+acme deploy
+```
+
+You'll receive a production URL like `https://my-first-widget.acme.app`.
+
+<Callout type="danger">
+Deploying overwrites the current production version. Use `acme deploy --canary` for gradual rollouts.
+</Callout>
+
+## What's Next?
+
+Now that your widget is live, explore these guides:
+
+- **[Your First Widget](first-widget.md)** - Build something more complex
+- **[Configuration](configuration.md)** - Customize your widget settings
+- **[Interactive Examples](../guides/interactive-examples.mdx)** - See MDX features in action
+- **[REST API](../api/rest-api.md)** - Integrate with the API

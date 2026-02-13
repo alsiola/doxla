@@ -1,0 +1,74 @@
+# Interactive Examples
+
+This page demonstrates MDX features supported in Doxla documentation.
+
+## Callouts
+
+Use callouts to highlight important information:
+
+<Callout type="info">
+MDX lets you use JSX components directly in your markdown. This makes documentation more expressive and interactive.
+</Callout>
+
+<Callout type="warning">
+Be careful when deploying widgets to production. Always test in staging first.
+</Callout>
+
+<Callout type="danger">
+Never commit secrets or API keys to your repository. Use the `@secret/` prefix in your configuration instead.
+</Callout>
+
+## Inline Expressions
+
+MDX supports JavaScript expressions. Here's the current year: {new Date().getFullYear()}.
+
+You can also compute values inline: {(() => { const features = ['MDX', 'GFM', 'Syntax Highlighting']; return features.join(', '); })()}.
+
+## Mixing Markdown and JSX
+
+Standard markdown works alongside JSX. Here's a regular list:
+
+- Item one with **bold** text
+- Item two with `inline code`
+- Item three with a [link](https://example.com)
+
+And here's a callout right after:
+
+<Callout type="info">
+Markdown formatting works **inside** callouts too, including `code`, *italics*, and [links](https://example.com).
+</Callout>
+
+## Code Examples
+
+Code blocks with syntax highlighting work as expected:
+
+```typescript
+import { Widget } from "@acme/widget-sdk";
+
+const widget = new Widget({
+  name: "mdx-demo",
+  version: "1.0.0",
+});
+
+widget.handle("hello", async (req) => {
+  return { status: 200, body: { message: "Hello from MDX!" } };
+});
+```
+
+## Tables
+
+GFM tables are fully supported in MDX:
+
+| Feature | Markdown | MDX |
+|---------|----------|-----|
+| Headings | Yes | Yes |
+| Code blocks | Yes | Yes |
+| JSX components | No | Yes |
+| Expressions | No | Yes |
+| Imports | No | Yes |
+
+## Related Pages
+
+- [Deployment Guide](deployment.md)
+- [Event Handlers](event-handlers.md)
+- [REST API Reference](../api/rest-api.md)

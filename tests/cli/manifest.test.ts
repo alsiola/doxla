@@ -64,4 +64,40 @@ describe("generateManifest", () => {
 
     expect(manifest.docs[0].content).toBe(content);
   });
+
+  it("creates correct slugs for .mdx files", async () => {
+    await mkdir(join(testDir, "guides"), { recursive: true });
+    await writeFile(join(testDir, "guides", "quick-start.mdx"), "# Quick Start");
+
+    const manifest = await generateManifest(testDir, ["guides/quick-start.mdx"]);
+
+    expect(manifest.docs[0].slug).toBe("guides/quick-start");
+  });
+
+  it("extracts title from .mdx files", async () => {
+    await writeFile(
+      join(testDir, "intro.mdx"),
+      "# Welcome to MDX\n\n<Callout>Hello</Callout>"
+    );
+
+    const manifest = await generateManifest(testDir, ["intro.mdx"]);
+
+    expect(manifest.docs[0].title).toBe("Welcome to MDX");
+  });
+
+  it("falls back to filename for .mdx without heading", async () => {
+    await writeFile(join(testDir, "my-guide.mdx"), "Some MDX content.");
+
+    const manifest = await generateManifest(testDir, ["my-guide.mdx"]);
+
+    expect(manifest.docs[0].title).toBe("My Guide");
+  });
+
+  it("preserves .mdx path in manifest", async () => {
+    await writeFile(join(testDir, "example.mdx"), "# Example");
+
+    const manifest = await generateManifest(testDir, ["example.mdx"]);
+
+    expect(manifest.docs[0].path).toBe("example.mdx");
+  });
 });

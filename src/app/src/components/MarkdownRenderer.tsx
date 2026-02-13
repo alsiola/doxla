@@ -5,34 +5,12 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight, oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import type { Components } from "react-markdown";
 import type { Theme } from "../App";
+import { resolveDocLink } from "../lib/doc-links";
 
 interface MarkdownRendererProps {
   content: string;
   theme: Theme;
   docPath?: string;
-}
-
-function resolveDocLink(href: string, docPath: string): string | null {
-  if (!href.match(/\.md(#.*)?$/i)) return null;
-  if (/^https?:\/\//.test(href)) return null;
-
-  const [filePart, anchor] = href.split("#");
-  const docDir = docPath.includes("/") ? docPath.replace(/\/[^/]+$/, "") : "";
-  const parts = (docDir ? `${docDir}/${filePart}` : filePart).split("/");
-
-  const resolved: string[] = [];
-  for (const part of parts) {
-    if (part === "..") resolved.pop();
-    else if (part !== ".") resolved.push(part);
-  }
-
-  const slug = resolved
-    .join("/")
-    .replace(/\.md$/i, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9/.-]/g, "-");
-
-  return `#/doc/${slug}${anchor ? `#${anchor}` : ""}`;
 }
 
 export function MarkdownRenderer({ content, theme, docPath }: MarkdownRendererProps) {

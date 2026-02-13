@@ -11,16 +11,16 @@ const IGNORE_PATTERNS = [
 ];
 
 export async function discoverMarkdownFiles(rootDir: string): Promise<string[]> {
-  const files = await fg("**/*.md", {
+  const files = await fg("**/*.{md,mdx}", {
     cwd: rootDir,
     ignore: IGNORE_PATTERNS,
     onlyFiles: true,
   });
 
-  // Sort: README.md first, then alphabetical
+  // Sort: README.md/README.mdx first, then alphabetical
   return files.sort((a, b) => {
-    const aIsReadme = a.toLowerCase() === "readme.md";
-    const bIsReadme = b.toLowerCase() === "readme.md";
+    const aIsReadme = /^readme\.mdx?$/i.test(a);
+    const bIsReadme = /^readme\.mdx?$/i.test(b);
     if (aIsReadme && !bIsReadme) return -1;
     if (!aIsReadme && bIsReadme) return 1;
     return a.localeCompare(b);

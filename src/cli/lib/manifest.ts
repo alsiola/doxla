@@ -10,7 +10,8 @@ function extractTitle(content: string, filePath: string): string {
   }
 
   // Fallback to filename without extension
-  const name = basename(filePath, ".md");
+  const ext = filePath.endsWith(".mdx") ? ".mdx" : ".md";
+  const name = basename(filePath, ext);
   if (name.toLowerCase() === "readme") {
     const dir = dirname(filePath);
     if (dir === ".") return "README";
@@ -21,7 +22,7 @@ function extractTitle(content: string, filePath: string): string {
 
 function createSlug(filePath: string): string {
   return filePath
-    .replace(/\.md$/i, "")
+    .replace(/\.mdx?$/i, "")
     .replace(/\\/g, "/")
     .toLowerCase()
     .replace(/[^a-z0-9/.-]/g, "-");

@@ -1,6 +1,7 @@
 import type { DocFile } from "../types/manifest";
 import type { Theme } from "../App";
 import { MarkdownRenderer } from "./MarkdownRenderer";
+import { MdxRenderer } from "./MdxRenderer";
 import { Badge } from "./ui/Badge";
 import { Separator } from "./ui/Separator";
 
@@ -9,8 +10,13 @@ interface DocPageProps {
   theme: Theme;
 }
 
+function isMdx(path: string): boolean {
+  return path.endsWith(".mdx");
+}
+
 export function DocPage({ doc, theme }: DocPageProps) {
   const pathParts = doc.path.split("/");
+  const mdx = isMdx(doc.path);
 
   return (
     <div>
@@ -32,12 +38,16 @@ export function DocPage({ doc, theme }: DocPageProps) {
 
       <div className="mb-4 flex items-center gap-3">
         <h1 className="text-3xl font-bold">{doc.title}</h1>
-        <Badge variant="secondary">.md</Badge>
+        <Badge variant="secondary">{mdx ? ".mdx" : ".md"}</Badge>
       </div>
 
       <Separator className="mb-6" />
 
-      <MarkdownRenderer content={doc.content} theme={theme} docPath={doc.path} />
+      {mdx ? (
+        <MdxRenderer content={doc.content} theme={theme} docPath={doc.path} />
+      ) : (
+        <MarkdownRenderer content={doc.content} theme={theme} docPath={doc.path} />
+      )}
     </div>
   );
 }

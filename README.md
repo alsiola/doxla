@@ -1,6 +1,6 @@
 # doxla
 
-Improve documentation discoverability within repos. Doxla discovers all `.md` files in your repository, builds a beautiful docs viewer, and deploys it to GitHub Pages.
+Improve documentation discoverability within repos. Doxla discovers all `.md` and `.mdx` files in your repository, builds a beautiful docs viewer, and deploys it to GitHub Pages.
 
 ## Why?
 
@@ -8,7 +8,7 @@ Documentation is most valuable when it lives next to the code it describes — b
 
 Meanwhile, AI coding assistants (Claude Code, Copilot, Cursor) work with what's in the repository. Docs in Notion or Google Docs are invisible to them. In-repo markdown is context they can read and act on.
 
-Doxla bridges the gap: keep your docs as `.md` files in your repo (where both humans and AI agents can find them), and Doxla turns them into a readable, searchable site.
+Doxla bridges the gap: keep your docs as `.md` or `.mdx` files in your repo (where both humans and AI agents can find them), and Doxla turns them into a readable, searchable site.
 
 Read the full rationale: [Why Doxla?](RATIONALE.md)
 
@@ -36,11 +36,12 @@ This creates a GitHub Actions workflow that builds and deploys your docs on ever
 npx doxla build
 ```
 
-This discovers all markdown files, builds a static docs site, and outputs it to `doxla-dist/`.
+This discovers all markdown and MDX files, builds a static docs site, and outputs it to `doxla-dist/`.
 
 ## Features
 
-- Automatic markdown file discovery (respects `.gitignore`-style patterns)
+- Automatic `.md` and `.mdx` file discovery (respects `.gitignore`-style patterns)
+- MDX support with built-in components (`<Callout>`) and JSX expressions
 - Beautiful React-based docs viewer with sidebar navigation
 - Full-text search across all documents
 - Syntax highlighting for code blocks
@@ -64,7 +65,7 @@ Creates `.github/workflows/doxla.yml` for automatic GitHub Pages deployment.
 
 ## How It Works
 
-1. **Discover** - Scans your repo for `.md` files (excluding `node_modules`, `.git`, etc.)
+1. **Discover** - Scans your repo for `.md` and `.mdx` files (excluding `node_modules`, `.git`, etc.)
 2. **Manifest** - Reads each file, extracts titles, and generates a JSON manifest
 3. **Build** - Copies the built-in React app template, injects the manifest, and runs `vite build`
 4. **Output** - Produces a static site ready for any hosting
