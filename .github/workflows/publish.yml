@@ -21,7 +21,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          registry-url: "https://registry.npmjs.org"
       - run: npm install -g pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
@@ -31,10 +30,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish to npm
         run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           PUBLISHED_VERSION=$(npm view doxla version 2>/dev/null || echo "0.0.0")
           if [ "$PACKAGE_VERSION" != "$PUBLISHED_VERSION" ]; then
             npm publish --provenance
           fi
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
