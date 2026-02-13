@@ -12,7 +12,13 @@ Run this in your repo to set up automatic deployment:
 npx doxla init
 ```
 
-This creates a GitHub Actions workflow that builds and deploys your docs on every push to `main`. Just enable GitHub Pages in your repo settings (Settings > Pages > Source: **GitHub Actions**).
+This creates a GitHub Actions workflow that builds and deploys your docs on every push to `main`.
+
+**Important:** You must enable GitHub Pages in your repo settings before the workflow will deploy:
+
+1. Go to **Settings** > **Pages**
+2. Under **Source**, select **GitHub Actions**
+3. Commit and push — the workflow handles the rest
 
 ### Build locally
 
