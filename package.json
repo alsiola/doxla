@@ -36,7 +36,7 @@
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "fast-glob": "^3.3.3",
-    "ora": "^8.2.0"
+    "ora": "^9.3.0"
   },
   "devDependencies": {
     "@mdx-js/mdx": "^3.1.0",
