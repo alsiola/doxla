@@ -1,13 +1,15 @@
 import type { DocFile } from "../types/manifest";
+import type { Theme } from "../App";
 import { MarkdownRenderer } from "./MarkdownRenderer";
 import { Badge } from "./ui/Badge";
 import { Separator } from "./ui/Separator";
 
 interface DocPageProps {
   doc: DocFile;
+  theme: Theme;
 }
 
-export function DocPage({ doc }: DocPageProps) {
+export function DocPage({ doc, theme }: DocPageProps) {
   const pathParts = doc.path.split("/");
 
   return (
@@ -35,7 +37,7 @@ export function DocPage({ doc }: DocPageProps) {
 
       <Separator className="mb-6" />
 
-      <MarkdownRenderer content={doc.content} />
+      <MarkdownRenderer content={doc.content} theme={theme} />
     </div>
   );
 }

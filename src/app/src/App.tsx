@@ -6,6 +6,18 @@ import { IndexPage } from "./components/IndexPage";
 import { DocPage } from "./components/DocPage";
 import { SearchResults } from "./components/SearchResults";
 
+export type Theme = "light" | "dark";
+
+const STORAGE_KEY = "doxla-theme";
+
+function getInitialTheme(): Theme {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored === "light" || stored === "dark") return stored;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
 const data = manifest as Manifest;
 
 type Route =
@@ -34,6 +46,20 @@ function parseHash(): Route {
 
 export default function App() {
   const [route, setRoute] = useState<Route>(parseHash);
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => {
+      const next = prev === "light" ? "dark" : "light";
+      localStorage.setItem(STORAGE_KEY, next);
+      document.documentElement.setAttribute("data-theme", next);
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
 
   const handleHashChange = useCallback(() => {
     setRoute(parseHash());
@@ -63,7 +89,7 @@ export default function App() {
             </div>
           );
         }
-        return <DocPage doc={doc} />;
+        return <DocPage doc={doc} theme={theme} />;
       }
       case "search":
         return <SearchResults docs={data.docs} query={route.query} />;
@@ -71,6 +97,8 @@ export default function App() {
   };
 
   return (
-    <Layout manifest={data}>{renderContent()}</Layout>
+    <Layout manifest={data} theme={theme} onToggleTheme={toggleTheme}>
+      {renderContent()}
+    </Layout>
   );
 }

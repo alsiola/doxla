@@ -1,44 +1,52 @@
+import { useMemo } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { oneLight, oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import type { Components } from "react-markdown";
+import type { Theme } from "../App";
 
 interface MarkdownRendererProps {
   content: string;
+  theme: Theme;
 }
 
-const components: Components = {
-  code(props) {
-    const { children, className, ...rest } = props;
-    const match = /language-(\w+)/.exec(className || "");
-    const isInline = !match;
+export function MarkdownRenderer({ content, theme }: MarkdownRendererProps) {
+  const syntaxStyle = theme === "dark" ? oneDark : oneLight;
 
-    if (isInline) {
-      return (
-        <code
-          className="rounded bg-muted px-1.5 py-0.5 text-sm font-mono"
-          {...rest}
-        >
-          {children}
-        </code>
-      );
-    }
+  const components: Components = useMemo(
+    () => ({
+      code(props) {
+        const { children, className, ...rest } = props;
+        const match = /language-(\w+)/.exec(className || "");
+        const isInline = !match;
 
-    return (
-      <SyntaxHighlighter
-        style={oneLight}
-        language={match[1]}
-        PreTag="div"
-        className="rounded-md text-sm"
-      >
-        {String(children).replace(/\n$/, "")}
-      </SyntaxHighlighter>
-    );
-  },
-};
+        if (isInline) {
+          return (
+            <code
+              className="rounded bg-muted px-1.5 py-0.5 text-sm font-mono"
+              {...rest}
+            >
+              {children}
+            </code>
+          );
+        }
 
-export function MarkdownRenderer({ content }: MarkdownRendererProps) {
+        return (
+          <SyntaxHighlighter
+            style={syntaxStyle}
+            language={match[1]}
+            PreTag="div"
+            className="rounded-md text-sm"
+          >
+            {String(children).replace(/\n$/, "")}
+          </SyntaxHighlighter>
+        );
+      },
+    }),
+    [syntaxStyle],
+  );
+
   return (
     <div className="prose prose-neutral max-w-none">
       <Markdown remarkPlugins={[remarkGfm]} components={components}>

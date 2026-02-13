@@ -1,13 +1,16 @@
 import { useState } from "react";
-import { Search, BookOpen } from "lucide-react";
+import { Search, BookOpen, Sun, Moon } from "lucide-react";
+import type { Theme } from "../../App";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 
 interface HeaderProps {
   repoName: string;
+  theme: Theme;
+  onToggleTheme: () => void;
 }
 
-export function Header({ repoName }: HeaderProps) {
+export function Header({ repoName, theme, onToggleTheme }: HeaderProps) {
   const [searchInput, setSearchInput] = useState("");
 
   const handleSearch = (e: React.FormEvent) => {
@@ -39,6 +42,15 @@ export function Header({ repoName }: HeaderProps) {
           Search
         </Button>
       </form>
+
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={onToggleTheme}
+        aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+      >
+        {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      </Button>
     </header>
   );
 }
