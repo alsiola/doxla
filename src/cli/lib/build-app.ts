@@ -32,20 +32,17 @@ export async function buildApp(
       "utf-8"
     );
 
-    // Write .env with base path
-    const envContent = `VITE_BASE_PATH=${options.basePath}\n`;
-    await writeFile(join(tempDir, ".env"), envContent, "utf-8");
-
     // Install dependencies
     execSync("npm install --no-audit --no-fund", {
       cwd: tempDir,
       stdio: "pipe",
     });
 
-    // Build with Vite
+    // Build with Vite, passing base path as env var
     execSync("npx vite build", {
       cwd: tempDir,
       stdio: "pipe",
+      env: { ...process.env, VITE_BASE_PATH: options.basePath },
     });
 
     // Copy output
