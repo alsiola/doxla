@@ -90,5 +90,4 @@ We use a pull request based flow. Work on appropriately named branches.
 7. **Draft PR** — Open a draft pull request.
 8. **CI Checks** — Ensure all status checks pass on PR. Resolve any failures.
 9. **Ready for Review** — Convert PR to "Ready for Review".
-10. **CoPilot Review** — GitHub CoPilot will now review the PR remotely. Wait for this review, read their comments, and if necessary address them.
-11. **Done** — Once the PR is ready to merge, you are finished, and can report back to the user.
+10. **Done** — Once the PR is ready to merge, you are finished, and can report back to the user.
