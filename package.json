@@ -23,6 +23,10 @@
     "markdown",
     "viewer"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alsiola/doxla.git"
+  },
   "license": "MIT",
   "dependencies": {
     "chalk": "^5.4.1",
