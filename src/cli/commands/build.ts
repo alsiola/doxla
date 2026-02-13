@@ -32,13 +32,13 @@ export async function buildCommand(options: BuildOptions) {
 
   // Step 2: Generate manifest
   const manifestSpinner = ora("Generating manifest...").start();
-  const manifest = await generateManifest(rootDir, files);
+  const { manifest, images } = await generateManifest(rootDir, files);
   manifestSpinner.succeed("Manifest generated");
 
   // Step 3: Build docs viewer
   const buildSpinner = ora("Building docs viewer...").start();
   try {
-    await buildApp(manifest, { output: outputDir, basePath });
+    await buildApp(manifest, { output: outputDir, basePath, rootDir, images });
     buildSpinner.succeed("Docs viewer built");
   } catch (error) {
     buildSpinner.fail("Build failed");

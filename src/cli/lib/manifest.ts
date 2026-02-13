@@ -1,6 +1,42 @@
 import { readFile } from "node:fs/promises";
-import { join, basename, dirname } from "node:path";
+import { join, basename, dirname, normalize } from "node:path";
 import type { Manifest, DocFile } from "../../app/src/types/manifest.js";
+
+function resolveImagePaths(
+  content: string,
+  docPath: string
+): { content: string; images: string[] } {
+  const docDir = dirname(docPath);
+  const images: string[] = [];
+
+  function resolve(src: string): string | null {
+    if (/^(https?:\/\/|data:)/.test(src)) return null;
+    const resolved = normalize(join(docDir, src)).replace(/\\/g, "/");
+    if (resolved.startsWith("..")) return null;
+    images.push(resolved);
+    return resolved;
+  }
+
+  // Rewrite markdown images: ![alt](path)
+  let result = content.replace(
+    /!\[([^\]]*)\]\(([^)]+)\)/g,
+    (match, alt, src) => {
+      const resolved = resolve(src);
+      return resolved ? `![${alt}](${resolved})` : match;
+    }
+  );
+
+  // Rewrite HTML images: <img ... src="path" ...>
+  result = result.replace(
+    /(<img\s[^>]*?)src=["']([^"']+)["']/g,
+    (match, prefix, src) => {
+      const resolved = resolve(src);
+      return resolved ? `${prefix}src="${resolved}"` : match;
+    }
+  );
+
+  return { content: result, images: [...new Set(images)] };
+}
 
 function extractTitleAndContent(
   content: string,
@@ -45,16 +81,20 @@ function createSlug(filePath: string): string {
 export async function generateManifest(
   rootDir: string,
   files: string[]
-): Promise<Manifest> {
+): Promise<{ manifest: Manifest; images: string[] }> {
+  const allImages: string[] = [];
+
   const docs: DocFile[] = await Promise.all(
     files.map(async (filePath) => {
       const fullPath = join(rootDir, filePath);
       const raw = await readFile(fullPath, "utf-8");
-      const { title, content } = extractTitleAndContent(raw, filePath);
+      const extracted = extractTitleAndContent(raw, filePath);
+      const { content, images } = resolveImagePaths(extracted.content, filePath);
+      allImages.push(...images);
       return {
         slug: createSlug(filePath),
         path: filePath,
-        title,
+        title: extracted.title,
         content,
       };
     })
@@ -63,9 +103,12 @@ export async function generateManifest(
   const repoName = basename(rootDir);
 
   return {
-    repoName,
-    generatedAt: new Date().toISOString(),
-    totalDocs: docs.length,
-    docs,
+    manifest: {
+      repoName,
+      generatedAt: new Date().toISOString(),
+      totalDocs: docs.length,
+      docs,
+    },
+    images: [...new Set(allImages)],
   };
 }

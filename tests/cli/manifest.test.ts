@@ -20,7 +20,7 @@ describe("generateManifest", () => {
   it("generates a manifest with correct structure", async () => {
     await writeFile(join(testDir, "README.md"), "# My Project\n\nWelcome!");
 
-    const manifest = await generateManifest(testDir, ["README.md"]);
+    const { manifest } = await generateManifest(testDir, ["README.md"]);
 
     expect(manifest.totalDocs).toBe(1);
     expect(manifest.docs).toHaveLength(1);
@@ -34,7 +34,7 @@ describe("generateManifest", () => {
       "# Getting Started\n\nSome content here."
     );
 
-    const manifest = await generateManifest(testDir, ["guide.md"]);
+    const { manifest } = await generateManifest(testDir, ["guide.md"]);
 
     expect(manifest.docs[0].title).toBe("Getting Started");
   });
@@ -42,7 +42,7 @@ describe("generateManifest", () => {
   it("falls back to filename when no heading", async () => {
     await writeFile(join(testDir, "my-guide.md"), "Just some content.");
 
-    const manifest = await generateManifest(testDir, ["my-guide.md"]);
+    const { manifest } = await generateManifest(testDir, ["my-guide.md"]);
 
     expect(manifest.docs[0].title).toBe("My Guide");
   });
@@ -51,7 +51,7 @@ describe("generateManifest", () => {
     await mkdir(join(testDir, "docs"), { recursive: true });
     await writeFile(join(testDir, "docs", "API Guide.md"), "# API");
 
-    const manifest = await generateManifest(testDir, ["docs/API Guide.md"]);
+    const { manifest } = await generateManifest(testDir, ["docs/API Guide.md"]);
 
     expect(manifest.docs[0].slug).toBe("docs/api-guide");
   });
@@ -59,7 +59,7 @@ describe("generateManifest", () => {
   it("strips leading heading from content", async () => {
     await writeFile(join(testDir, "test.md"), "# Hello\n\nWorld!");
 
-    const manifest = await generateManifest(testDir, ["test.md"]);
+    const { manifest } = await generateManifest(testDir, ["test.md"]);
 
     expect(manifest.docs[0].title).toBe("Hello");
     expect(manifest.docs[0].content).toBe("World!");
@@ -69,7 +69,7 @@ describe("generateManifest", () => {
     const content = "Just some content.";
     await writeFile(join(testDir, "test.md"), content);
 
-    const manifest = await generateManifest(testDir, ["test.md"]);
+    const { manifest } = await generateManifest(testDir, ["test.md"]);
 
     expect(manifest.docs[0].content).toBe(content);
   });
@@ -78,7 +78,7 @@ describe("generateManifest", () => {
     const content = "Intro text.\n\n# Mid Heading\n\nMore content.";
     await writeFile(join(testDir, "my-doc.md"), content);
 
-    const manifest = await generateManifest(testDir, ["my-doc.md"]);
+    const { manifest } = await generateManifest(testDir, ["my-doc.md"]);
 
     expect(manifest.docs[0].title).toBe("My Doc");
     expect(manifest.docs[0].content).toBe(content);
@@ -87,7 +87,7 @@ describe("generateManifest", () => {
   it("strips heading preceded by blank lines", async () => {
     await writeFile(join(testDir, "test.md"), "\n\n# Title\n\nBody here.");
 
-    const manifest = await generateManifest(testDir, ["test.md"]);
+    const { manifest } = await generateManifest(testDir, ["test.md"]);
 
     expect(manifest.docs[0].title).toBe("Title");
     expect(manifest.docs[0].content).toBe("Body here.");
@@ -97,7 +97,7 @@ describe("generateManifest", () => {
     await mkdir(join(testDir, "guides"), { recursive: true });
     await writeFile(join(testDir, "guides", "quick-start.mdx"), "# Quick Start");
 
-    const manifest = await generateManifest(testDir, ["guides/quick-start.mdx"]);
+    const { manifest } = await generateManifest(testDir, ["guides/quick-start.mdx"]);
 
     expect(manifest.docs[0].slug).toBe("guides/quick-start");
   });
@@ -108,7 +108,7 @@ describe("generateManifest", () => {
       "# Welcome to MDX\n\n<Callout>Hello</Callout>"
     );
 
-    const manifest = await generateManifest(testDir, ["intro.mdx"]);
+    const { manifest } = await generateManifest(testDir, ["intro.mdx"]);
 
     expect(manifest.docs[0].title).toBe("Welcome to MDX");
   });
@@ -116,7 +116,7 @@ describe("generateManifest", () => {
   it("falls back to filename for .mdx without heading", async () => {
     await writeFile(join(testDir, "my-guide.mdx"), "Some MDX content.");
 
-    const manifest = await generateManifest(testDir, ["my-guide.mdx"]);
+    const { manifest } = await generateManifest(testDir, ["my-guide.mdx"]);
 
     expect(manifest.docs[0].title).toBe("My Guide");
   });
@@ -124,7 +124,7 @@ describe("generateManifest", () => {
   it("handles file with only a heading and no content", async () => {
     await writeFile(join(testDir, "test.md"), "# Only Title");
 
-    const manifest = await generateManifest(testDir, ["test.md"]);
+    const { manifest } = await generateManifest(testDir, ["test.md"]);
 
     expect(manifest.docs[0].title).toBe("Only Title");
     expect(manifest.docs[0].content).toBe("");
@@ -133,8 +133,45 @@ describe("generateManifest", () => {
   it("preserves .mdx path in manifest", async () => {
     await writeFile(join(testDir, "example.mdx"), "# Example");
 
-    const manifest = await generateManifest(testDir, ["example.mdx"]);
+    const { manifest } = await generateManifest(testDir, ["example.mdx"]);
 
     expect(manifest.docs[0].path).toBe("example.mdx");
+  });
+
+  it("resolves relative image paths to root-relative", async () => {
+    await mkdir(join(testDir, "guides"), { recursive: true });
+    await writeFile(
+      join(testDir, "guides", "intro.md"),
+      "# Intro\n\n![logo](../logo.png)"
+    );
+
+    const { manifest, images } = await generateManifest(testDir, ["guides/intro.md"]);
+
+    expect(manifest.docs[0].content).toBe("![logo](logo.png)");
+    expect(images).toEqual(["logo.png"]);
+  });
+
+  it("resolves HTML image src to root-relative", async () => {
+    await writeFile(
+      join(testDir, "readme.md"),
+      '# Hi\n\n<img src="logo.png" alt="Logo" />'
+    );
+
+    const { manifest, images } = await generateManifest(testDir, ["readme.md"]);
+
+    expect(manifest.docs[0].content).toBe('<img src="logo.png" alt="Logo" />');
+    expect(images).toEqual(["logo.png"]);
+  });
+
+  it("skips absolute URLs in images", async () => {
+    await writeFile(
+      join(testDir, "test.md"),
+      "# Test\n\n![ext](https://example.com/img.png)"
+    );
+
+    const { manifest, images } = await generateManifest(testDir, ["test.md"]);
+
+    expect(manifest.docs[0].content).toBe("![ext](https://example.com/img.png)");
+    expect(images).toEqual([]);
   });
 });

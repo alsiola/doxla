@@ -9,6 +9,8 @@ import { getTemplatePath } from "./template.js";
 interface BuildOptions {
   output: string;
   basePath: string;
+  rootDir: string;
+  images: string[];
 }
 
 export async function buildApp(
@@ -31,6 +33,18 @@ export async function buildApp(
       JSON.stringify(manifest, null, 2),
       "utf-8"
     );
+
+    // Copy referenced images to public dir
+    if (options.images.length > 0) {
+      const publicDir = join(tempDir, "public");
+      await mkdir(publicDir, { recursive: true });
+      for (const img of options.images) {
+        const src = join(options.rootDir, img);
+        const dest = join(publicDir, img);
+        await mkdir(join(dest, ".."), { recursive: true });
+        await cp(src, dest).catch(() => {});
+      }
+    }
 
     // Install dependencies
     execSync("npm install --no-audit --no-fund", {
