@@ -20,13 +20,7 @@ function extractTitleAndContent(
     break;
   }
 
-  // No leading heading — try any heading in the document for the title
-  const match = content.match(/^#\s+(.+)$/m);
-  if (match) {
-    return { title: match[1].trim(), content };
-  }
-
-  // Fallback to filename without extension
+  // No leading heading — fallback to filename
   const ext = filePath.endsWith(".mdx") ? ".mdx" : ".md";
   const name = basename(filePath, ext);
   if (name.toLowerCase() === "readme") {
