@@ -103,9 +103,17 @@ function TreeItem({
 export function FileTree({ docs }: { docs: DocFile[] }) {
   const tree = buildTree(docs);
 
+  const sortedRoots = Array.from(tree.children.values()).sort((a, b) => {
+    const aIsFolder = a.children.size > 0 && !a.doc;
+    const bIsFolder = b.children.size > 0 && !b.doc;
+    if (aIsFolder && !bIsFolder) return -1;
+    if (!aIsFolder && bIsFolder) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
   return (
     <nav className="space-y-0.5">
-      {Array.from(tree.children.values()).map((node) => (
+      {sortedRoots.map((node) => (
         <TreeItem key={node.path} node={node} depth={0} />
       ))}
     </nav>
