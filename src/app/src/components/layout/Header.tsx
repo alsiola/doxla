@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Search, BookOpen, Sun, Moon } from "lucide-react";
+import { Search, Sun, Moon } from "lucide-react";
 import type { Theme } from "../../App";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
+import logoSrc from "../../assets/logo.svg";
 
 interface HeaderProps {
   repoName: string;
@@ -23,7 +24,7 @@ export function Header({ repoName, theme, onToggleTheme }: HeaderProps) {
   return (
     <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b border-border bg-background px-6">
       <a href="#/" className="flex items-center gap-2 font-semibold">
-        <BookOpen className="h-5 w-5" />
+        <img src={logoSrc} alt="Doxla" className="h-5 w-5 object-contain" />
         <span>{repoName}</span>
       </a>
 
