@@ -14,7 +14,7 @@ interface IndexPageProps {
 }
 
 function getPreview(content: string): string {
-  // Strip the first heading and get the first non-empty paragraph
+  // Strip the first heading and get the first non-empty text paragraph
   const lines = content.split("\n");
   let foundHeading = false;
   const previewLines: string[] = [];
@@ -29,7 +29,10 @@ function getPreview(content: string): string {
       if (previewLines.length > 0) break;
       continue;
     }
-    previewLines.push(trimmed);
+    // Strip HTML tags and skip lines that are only HTML/images
+    const textOnly = trimmed.replace(/<[^>]+>/g, "").trim();
+    if (textOnly === "") continue;
+    previewLines.push(textOnly);
   }
 
   const preview = previewLines.join(" ");
