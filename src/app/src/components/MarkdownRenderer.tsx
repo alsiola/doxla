@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import Markdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight, oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -61,7 +62,7 @@ export function MarkdownRenderer({ content, theme, docPath }: MarkdownRendererPr
 
   return (
     <div className={`prose prose-neutral max-w-none ${theme === "dark" ? "prose-invert" : ""}`}>
-      <Markdown remarkPlugins={[remarkGfm]} components={components}>
+      <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
         {content}
       </Markdown>
     </div>

@@ -74,13 +74,13 @@ describe("generateManifest", () => {
     expect(manifest.docs[0].content).toBe(content);
   });
 
-  it("does not strip mid-document heading", async () => {
+  it("falls back to filename when heading is not leading", async () => {
     const content = "Intro text.\n\n# Mid Heading\n\nMore content.";
-    await writeFile(join(testDir, "test.md"), content);
+    await writeFile(join(testDir, "my-doc.md"), content);
 
-    const manifest = await generateManifest(testDir, ["test.md"]);
+    const manifest = await generateManifest(testDir, ["my-doc.md"]);
 
-    expect(manifest.docs[0].title).toBe("Mid Heading");
+    expect(manifest.docs[0].title).toBe("My Doc");
     expect(manifest.docs[0].content).toBe(content);
   });
 
