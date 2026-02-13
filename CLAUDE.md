@@ -68,6 +68,7 @@ Example documentation files used for manual testing. Not included in the npm pac
 - Commit messages follow conventional commits (`feat:`, `fix:`, `ci:`, etc.) for semantic-release.
 - Tests use temp directories with random names for filesystem tests, cleaned up in `afterEach`.
 - React components use Tailwind classes via `clsx`/`tailwind-merge` (utility in `src/app/src/lib/utils.ts`).
+- Keep community standards files up to date: `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `SECURITY.md`, issue templates (`.github/ISSUE_TEMPLATE/`), and PR template (`.github/pull_request_template.md`).
 
 ## Workflow
 
