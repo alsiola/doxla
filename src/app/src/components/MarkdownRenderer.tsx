@@ -82,7 +82,7 @@ export function MarkdownRenderer({ content, theme, docPath }: MarkdownRendererPr
   );
 
   return (
-    <div className="prose prose-neutral max-w-none">
+    <div className={`prose prose-neutral max-w-none ${theme === "dark" ? "prose-invert" : ""}`}>
       <Markdown remarkPlugins={[remarkGfm]} components={components}>
         {content}
       </Markdown>

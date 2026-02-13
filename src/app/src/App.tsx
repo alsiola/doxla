@@ -63,6 +63,7 @@ export default function App() {
 
   const handleHashChange = useCallback(() => {
     setRoute(parseHash());
+    window.scrollTo(0, 0);
   }, []);
 
   useEffect(() => {
