@@ -1,7 +1,9 @@
 name: Deploy Doxla Docs
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Publish to npm"]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
 
@@ -16,6 +18,7 @@ concurrency:
 
 jobs:
   build-and-deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
