@@ -29,11 +29,12 @@ function getPreview(content: string): string {
       if (previewLines.length > 0) break;
       continue;
     }
-    // Strip HTML tags, then remove any stray angle brackets left by malformed markup
-    const textOnly = trimmed
-      .replace(/<[^>]+>/g, "")
-      .replace(/[<>]/g, "")
-      .trim();
+    // Strip HTML tags in a loop to handle nested/malformed markup
+    let textOnly = trimmed;
+    while (/<[^>]+>/.test(textOnly)) {
+      textOnly = textOnly.replace(/<[^>]+>/g, "");
+    }
+    textOnly = textOnly.replace(/[<>]/g, "").trim();
     if (textOnly === "") continue;
     previewLines.push(textOnly);
   }
