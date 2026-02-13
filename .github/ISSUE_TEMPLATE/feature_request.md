@@ -1,10 +1,10 @@
 ---
-  name: Feature Request
-  about: Suggest a new feature for Doxla
-  title: ""
-  labels: enhancement
-  assignees: ""
-  ---
+name: Feature Request
+about: Suggest a new feature for Doxla
+title: ""
+labels: enhancement
+assignees: ""
+---
 
   ## Problem
 
