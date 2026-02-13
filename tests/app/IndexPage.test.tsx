@@ -40,4 +40,34 @@ describe("IndexPage", () => {
     const link = screen.getByText("Getting Started").closest("a");
     expect(link?.getAttribute("href")).toBe("#/doc/readme");
   });
+
+  it("strips nested/malformed HTML tags from preview", () => {
+    const docs: DocFile[] = [
+      {
+        slug: "test",
+        path: "test.md",
+        title: "Test",
+        content:
+          "# Test\n\n<scr<script>ipt>alert('xss')</scr</script>ipt> safe text",
+      },
+    ];
+    render(<IndexPage docs={docs} />);
+    const description = document.querySelector(".text-sm.text-muted-foreground");
+    expect(description?.textContent).not.toContain("<");
+    expect(description?.textContent).not.toContain(">");
+    expect(description?.textContent).toContain("safe text");
+  });
+
+  it("strips simple HTML tags from preview", () => {
+    const docs: DocFile[] = [
+      {
+        slug: "test",
+        path: "test.md",
+        title: "Test",
+        content: "# Test\n\n<p><img src=\"test.png\" /></p>Some text here",
+      },
+    ];
+    render(<IndexPage docs={docs} />);
+    expect(screen.getByText("Some text here")).toBeTruthy();
+  });
 });
