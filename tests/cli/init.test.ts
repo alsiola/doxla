@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { mkdir, readFile, rm } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -8,6 +8,7 @@ import { randomBytes } from "node:crypto";
 // We test the core behavior by importing the workflow template and simulating
 // what the init command does (write the file)
 import { workflowTemplate } from "../../src/cli/templates/doxla-workflow";
+import { initCommand } from "../../src/cli/commands/init";
 
 describe("init command", () => {
   let testDir: string;
@@ -42,11 +43,59 @@ describe("init command", () => {
     const workflowPath = join(workflowDir, "doxla.yml");
 
     await mkdir(workflowDir, { recursive: true });
-    const { writeFile } = await import("node:fs/promises");
     await writeFile(workflowPath, workflowTemplate, "utf-8");
 
     expect(existsSync(workflowPath)).toBe(true);
     const content = await readFile(workflowPath, "utf-8");
     expect(content).toBe(workflowTemplate);
+  });
+
+  it("adds doxla config to existing package.json", async () => {
+    await writeFile(
+      join(testDir, "package.json"),
+      JSON.stringify({ name: "test-project" }),
+      "utf-8"
+    );
+
+    await initCommand();
+
+    const pkg = JSON.parse(
+      await readFile(join(testDir, "package.json"), "utf-8")
+    );
+    expect(pkg.doxla).toEqual({
+      components: { dir: "docs/components" },
+      dependencies: {},
+    });
+  });
+
+  it("preserves existing doxla config", async () => {
+    const existingConfig = {
+      components: { dir: "custom/path" },
+      dependencies: { recharts: "^2.0.0" },
+    };
+    await writeFile(
+      join(testDir, "package.json"),
+      JSON.stringify({ name: "test-project", doxla: existingConfig }),
+      "utf-8"
+    );
+
+    await initCommand();
+
+    const pkg = JSON.parse(
+      await readFile(join(testDir, "package.json"), "utf-8")
+    );
+    expect(pkg.doxla).toEqual(existingConfig);
+  });
+
+  it("works when no package.json exists", async () => {
+    // Should not throw
+    await initCommand();
+
+    // Workflow file should still be created
+    expect(
+      existsSync(join(testDir, ".github", "workflows", "doxla.yml"))
+    ).toBe(true);
+    // No package.json should be created
+    expect(existsSync(join(testDir, "package.json"))).toBe(false);
   });
 });
