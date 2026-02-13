@@ -2,11 +2,28 @@ import { readFile } from "node:fs/promises";
 import { join, basename, dirname } from "node:path";
 import type { Manifest, DocFile } from "../../app/src/types/manifest.js";
 
-function extractTitle(content: string, filePath: string): string {
-  // Try to extract from first # heading
+function extractTitleAndContent(
+  content: string,
+  filePath: string
+): { title: string; content: string } {
+  // Check if the first non-blank line is a # heading
+  const lines = content.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].trim() === "") continue;
+
+    const match = lines[i].match(/^#\s+(.+)$/);
+    if (match) {
+      const title = match[1].trim();
+      const remaining = lines.slice(i + 1).join("\n").trimStart();
+      return { title, content: remaining };
+    }
+    break;
+  }
+
+  // No leading heading — try any heading in the document for the title
   const match = content.match(/^#\s+(.+)$/m);
   if (match) {
-    return match[1].trim();
+    return { title: match[1].trim(), content };
   }
 
   // Fallback to filename without extension
@@ -14,10 +31,13 @@ function extractTitle(content: string, filePath: string): string {
   const name = basename(filePath, ext);
   if (name.toLowerCase() === "readme") {
     const dir = dirname(filePath);
-    if (dir === ".") return "README";
-    return `${dir} - README`;
+    if (dir === ".") return { title: "README", content };
+    return { title: `${dir} - README`, content };
   }
-  return name.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return {
+    title: name.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+    content,
+  };
 }
 
 function createSlug(filePath: string): string {
@@ -35,11 +55,12 @@ export async function generateManifest(
   const docs: DocFile[] = await Promise.all(
     files.map(async (filePath) => {
       const fullPath = join(rootDir, filePath);
-      const content = await readFile(fullPath, "utf-8");
+      const raw = await readFile(fullPath, "utf-8");
+      const { title, content } = extractTitleAndContent(raw, filePath);
       return {
         slug: createSlug(filePath),
         path: filePath,
-        title: extractTitle(content, filePath),
+        title,
         content,
       };
     })
