@@ -1,16 +1,20 @@
-import { cp, writeFile, rm, mkdir } from "node:fs/promises";
+import { cp, readFile, writeFile, rm, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { execSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import type { Manifest } from "../../app/src/types/manifest.js";
 import { getTemplatePath } from "./template.js";
+import type { DiscoveredComponent } from "./components.js";
+import { generateBarrelContent } from "./components.js";
 
 interface BuildOptions {
   output: string;
   basePath: string;
   rootDir: string;
   images: string[];
+  components: DiscoveredComponent[];
+  extraDependencies: Record<string, string>;
 }
 
 export async function buildApp(
@@ -44,6 +48,40 @@ export async function buildApp(
         await mkdir(join(dest, ".."), { recursive: true });
         await cp(src, dest).catch(() => {});
       }
+    }
+
+    // Copy custom components into temp app
+    const userComponentsDir = join(tempDir, "src", "user-components");
+    await mkdir(userComponentsDir, { recursive: true });
+
+    if (options.components.length > 0) {
+      for (const component of options.components) {
+        const src = join(options.rootDir, component.filePath);
+        const dest = join(userComponentsDir, `${component.fileName}.tsx`);
+        try {
+          await cp(src, dest);
+        } catch (err) {
+          throw new Error(
+            `Failed to copy component ${component.name} from ${component.filePath}: ${(err as Error).message}`
+          );
+        }
+      }
+    }
+
+    // Write barrel file (always, overwrites placeholder)
+    await writeFile(
+      join(userComponentsDir, "index.ts"),
+      generateBarrelContent(options.components),
+      "utf-8"
+    );
+
+    // Merge extra dependencies into temp package.json
+    if (Object.keys(options.extraDependencies).length > 0) {
+      const pkgPath = join(tempDir, "package.json");
+      const pkgRaw = await readFile(pkgPath, "utf-8");
+      const pkg = JSON.parse(pkgRaw);
+      pkg.dependencies = { ...pkg.dependencies, ...options.extraDependencies };
+      await writeFile(pkgPath, JSON.stringify(pkg, null, 2), "utf-8");
     }
 
     // Install dependencies

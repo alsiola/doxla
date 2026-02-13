@@ -55,6 +55,12 @@ This discovers all markdown and MDX files, builds a static docs site, and output
 - Responsive layout
 - Zero configuration required
 
+## Custom Components
+
+Doxla supports custom React components in MDX files. Create `.tsx` components in `docs/components/` (or a configured directory), and they become available in all your `.mdx` files automatically. Components can use the `useDoxla()` hook to access the current theme.
+
+See [Custom Components](docs/custom-components.mdx) for a full guide and [Configuration](docs/configuration.mdx) for all config options.
+
 ## CLI Options
 
 ### `doxla init`

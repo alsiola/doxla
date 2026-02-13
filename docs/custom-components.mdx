@@ -1,0 +1,174 @@
+# Custom Components
+
+Doxla supports custom React components in your MDX documentation. Write components in your repo, reference them in your `.mdx` files, and Doxla handles the rest at build time.
+
+<FeatureCard title="You're looking at a custom component">
+This `FeatureCard` is a custom component defined in `docs/components/FeatureCard.tsx` and used directly in this MDX file. It even adapts to your current theme using the `useDoxla()` hook.
+</FeatureCard>
+
+## Quick Start
+
+### 1. Create a components directory
+
+By default, Doxla looks for components in `docs/components/`. Create it and add a component:
+
+```
+my-repo/
+  docs/
+    components/
+      FeatureCard.tsx    <-- your custom component
+    getting-started.mdx  <-- uses <FeatureCard>
+  package.json
+```
+
+### 2. Write a component
+
+Create a `.tsx` file that exports a default function component. Tailwind classes are available, and you can import the `cn` utility from `"doxla"` for conditional class merging:
+
+```tsx
+// docs/components/Alert.tsx
+import { cn } from "doxla";
+
+export default function Alert({ children, variant = "default" }: {
+  children: React.ReactNode;
+  variant?: "default" | "warning";
+}) {
+  return (
+    <div className={cn(
+      "rounded-lg border p-4",
+      variant === "warning"
+        ? "border-amber-500 bg-amber-50 dark:bg-amber-950/30"
+        : "border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
+    )}>
+      {children}
+    </div>
+  );
+}
+```
+
+### 3. Use it in MDX
+
+Reference the component by its file name (without the extension) in any `.mdx` file:
+
+```mdx
+# My Page
+
+<Alert>This is a custom alert component.</Alert>
+```
+
+### 4. Build
+
+```bash
+npx doxla build
+```
+
+Doxla discovers your components, bundles them into the viewer app, and makes them available to all MDX files automatically.
+
+## Theme-Aware Components with `useDoxla()`
+
+Import `useDoxla` and `cn` from `"doxla"` to access the current theme and conditionally merge Tailwind classes:
+
+```tsx
+import { useDoxla, cn } from "doxla";
+
+export default function ThemeBox({ children }: { children: React.ReactNode }) {
+  const { theme } = useDoxla();
+  return (
+    <div className={cn(
+      "rounded-lg p-4",
+      theme === "dark" ? "bg-slate-800 text-slate-200" : "bg-slate-100 text-slate-800"
+    )}>
+      {children}
+    </div>
+  );
+}
+```
+
+<FeatureCard title="The doxla API">
+The `"doxla"` import provides `useDoxla()` (theme access), `cn()` (Tailwind class merging via `clsx` + `tailwind-merge`), and the `Theme` type. The import path is resolved via a Vite alias at build time -- no extra packages to install.
+</FeatureCard>
+
+## Adding npm Dependencies
+
+If your components use external npm packages, declare them in the `doxla.dependencies` field of your `package.json`:
+
+```json
+{
+  "doxla": {
+    "dependencies": {
+      "framer-motion": "^11.0.0"
+    }
+  }
+}
+```
+
+These packages are installed alongside the viewer app during the build, so your components can import them freely:
+
+```tsx
+import { motion } from "framer-motion";
+
+export default function FadeIn({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      {children}
+    </motion.div>
+  );
+}
+```
+
+## Naming Conventions
+
+<FeatureCard title="Component naming rules">
+- File names must be **PascalCase** (e.g., `FeatureCard.tsx`, `AlertBanner.tsx`).
+- Only **alphanumeric characters** are allowed in file names -- no hyphens, underscores, or dots (other than the `.tsx` extension).
+- Each file must have a **default export** that is a React component.
+- The component is referenced in MDX by its file name without the extension: `FeatureCard.tsx` becomes `<FeatureCard>`.
+</FeatureCard>
+
+## Changing the Components Directory
+
+By default, Doxla looks for components in `docs/components/`. You can change this with the `components.dir` config option:
+
+```json
+{
+  "doxla": {
+    "components": {
+      "dir": "src/mdx-components"
+    }
+  }
+}
+```
+
+See the [Configuration](configuration) reference for all options.
+
+## How It Works
+
+During `doxla build`, the following happens:
+
+1. **Discovery** -- Doxla reads the `components.dir` directory and finds all `.tsx` files with valid PascalCase names.
+2. **Copy** -- Component source files are copied into the viewer app's source tree.
+3. **Registration** -- An auto-generated module imports all discovered components and maps them by name.
+4. **Build** -- Vite bundles everything together. The `"doxla"` import alias resolves to the internal context API.
+5. **Render** -- When an MDX file references `<FeatureCard>`, the MDX runtime looks it up in the component map and renders it.
+
+Custom components have full access to React and any dependencies declared in your config. They run in the browser alongside the rest of the docs viewer.
+
+## Built-in Components
+
+Doxla ships with a `<Callout>` component that is always available in MDX files:
+
+```mdx
+<Callout type="info">This is an info callout.</Callout>
+<Callout type="warning">This is a warning.</Callout>
+<Callout type="danger">This is a danger callout.</Callout>
+```
+
+<Callout type="warning">
+If you create a custom component named `Callout`, it will override the built-in one. Choose a different name to keep both available.
+</Callout>
+
+## Tips
+
+- Keep components simple and focused. Complex state management or data fetching may not work well in a static docs context.
+- Use Tailwind classes with the `cn()` utility from `"doxla"` for styling. All Tailwind classes from the viewer app are available.
+- Test your components by running `npx doxla build` locally and previewing the output.

@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { existsSync } from "node:fs";
 import chalk from "chalk";
@@ -19,6 +19,26 @@ export async function initCommand() {
   await writeFile(workflowPath, workflowTemplate, "utf-8");
 
   console.log(chalk.green("✓ Created .github/workflows/doxla.yml"));
+
+  // Add doxla config to package.json if it doesn't exist
+  const pkgPath = join(process.cwd(), "package.json");
+  if (existsSync(pkgPath)) {
+    try {
+      const raw = await readFile(pkgPath, "utf-8");
+      const pkg = JSON.parse(raw);
+      if (!pkg.doxla) {
+        pkg.doxla = {
+          components: { dir: "docs/components" },
+          dependencies: {},
+        };
+        await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + "\n", "utf-8");
+        console.log(chalk.green("✓ Added doxla config to package.json"));
+      }
+    } catch {
+      // Skip if package.json is malformed
+    }
+  }
+
   console.log();
   console.log("Next steps:");
   console.log(
@@ -27,5 +47,8 @@ export async function initCommand() {
   console.log("  2. Commit and push the workflow file");
   console.log(
     "  3. Your docs will be built and deployed on every push to main"
+  );
+  console.log(
+    `  4. Add custom MDX components in ${chalk.bold("docs/components/")} (optional)`
   );
 }

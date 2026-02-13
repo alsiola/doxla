@@ -7,8 +7,10 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight, oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import type { Theme } from "../App";
 import { resolveDocLink } from "../lib/doc-links";
+import { DoxlaProvider } from "../context/DoxlaContext";
 import { Callout } from "./mdx/Callout";
 import { MdxErrorBoundary } from "./mdx/MdxErrorBoundary";
+import * as userComponents from "../user-components";
 
 interface MdxRendererProps {
   content: string;
@@ -18,6 +20,7 @@ interface MdxRendererProps {
 
 const builtinComponents = {
   Callout,
+  ...userComponents,
 };
 
 // WARNING: evaluate() executes arbitrary JavaScript from MDX content.
@@ -115,10 +118,12 @@ export function MdxRenderer({ content, theme, docPath }: MdxRendererProps) {
   }
 
   return (
-    <div className={`prose prose-neutral max-w-none ${theme === "dark" ? "prose-invert" : ""}`}>
-      <MdxErrorBoundary>
-        <MdxContent components={mdxComponents} />
-      </MdxErrorBoundary>
-    </div>
+    <DoxlaProvider theme={theme}>
+      <div className={`prose prose-neutral max-w-none ${theme === "dark" ? "prose-invert" : ""}`}>
+        <MdxErrorBoundary>
+          <MdxContent components={mdxComponents} />
+        </MdxErrorBoundary>
+      </div>
+    </DoxlaProvider>
   );
 }

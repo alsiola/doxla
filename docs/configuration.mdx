@@ -1,0 +1,91 @@
+# Configuration
+
+Doxla works with zero configuration. When you need to customize behavior, add a `doxla` key to your project's `package.json`.
+
+```json
+{
+  "name": "my-project",
+  "version": "1.0.0",
+  "doxla": {
+    "components": {
+      "dir": "docs/components"
+    },
+    "dependencies": {
+      "framer-motion": "^11.0.0"
+    }
+  }
+}
+```
+
+## Options
+
+### `components.dir`
+
+| | |
+|---|---|
+| **Type** | `string` |
+| **Default** | `"docs/components"` |
+
+The directory where Doxla looks for custom React components. These components become available in all `.mdx` files automatically.
+
+```json
+{
+  "doxla": {
+    "components": {
+      "dir": "src/mdx-components"
+    }
+  }
+}
+```
+
+Component files in this directory must:
+- Use PascalCase file names (e.g., `FeatureCard.tsx`)
+- Have a default export that is a React component
+- Use only alphanumeric characters in the file name
+
+See [Custom Components](custom-components) for a full guide.
+
+### `dependencies`
+
+| | |
+|---|---|
+| **Type** | `Record<string, string>` |
+| **Default** | `{}` |
+
+Extra npm packages to install in the viewer app at build time. Use this when your custom components import third-party libraries.
+
+```json
+{
+  "doxla": {
+    "dependencies": {
+      "framer-motion": "^11.0.0",
+      "@heroicons/react": "^2.0.0"
+    }
+  }
+}
+```
+
+Package versions follow standard npm semver syntax. These dependencies are installed in an isolated build environment and do not affect your project's `node_modules`.
+
+## Example
+
+A complete configuration using both options:
+
+```json
+{
+  "name": "my-project",
+  "version": "1.0.0",
+  "doxla": {
+    "components": {
+      "dir": "docs/components"
+    },
+    "dependencies": {
+      "framer-motion": "^11.0.0"
+    }
+  }
+}
+```
+
+<Callout type="info">
+If you don't need custom components or extra dependencies, you can omit the `doxla` key entirely. Doxla will use sensible defaults.
+</Callout>

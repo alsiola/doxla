@@ -4,6 +4,8 @@ import ora from "ora";
 import { discoverMarkdownFiles } from "../lib/discover.js";
 import { generateManifest } from "../lib/manifest.js";
 import { buildApp } from "../lib/build-app.js";
+import { readConfig } from "../lib/config.js";
+import { discoverComponents } from "../lib/components.js";
 
 interface BuildOptions {
   output: string;
@@ -35,10 +37,27 @@ export async function buildCommand(options: BuildOptions) {
   const { manifest, images } = await generateManifest(rootDir, files);
   manifestSpinner.succeed("Manifest generated");
 
-  // Step 3: Build docs viewer
+  // Step 3: Discover custom components
+  const config = await readConfig(rootDir);
+  const components = await discoverComponents(rootDir, config.components.dir);
+
+  if (components.length > 0) {
+    console.log(
+      chalk.cyan(`  Found ${components.length} custom component${components.length === 1 ? "" : "s"}`)
+    );
+  }
+
+  // Step 4: Build docs viewer
   const buildSpinner = ora("Building docs viewer...").start();
   try {
-    await buildApp(manifest, { output: outputDir, basePath, rootDir, images });
+    await buildApp(manifest, {
+      output: outputDir,
+      basePath,
+      rootDir,
+      images,
+      components,
+      extraDependencies: config.dependencies,
+    });
     buildSpinner.succeed("Docs viewer built");
   } catch (error) {
     buildSpinner.fail("Build failed");
