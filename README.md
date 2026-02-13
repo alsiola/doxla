@@ -4,6 +4,8 @@
 
 # doxla
 
+[![AI-Agent Readiness](https://ready.kerex.app/api/badge/alsiola/doxla)](https://ready.kerex.app/analysis/alsiola/doxla)
+
 Improve documentation discoverability within repos. Doxla discovers all `.md` and `.mdx` files in your repository, builds a beautiful docs viewer, and deploys it to GitHub Pages.
 
 ## Why?

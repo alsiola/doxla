@@ -11,10 +11,10 @@ pnpm test             # Run all tests (vitest)
 pnpm test:watch       # Run tests in watch mode
 ```
 
-To test the full build pipeline against the sample docs:
+To test the full build pipeline against the repo's own docs:
 
 ```bash
-node dist/cli/index.js build --root @sample-docs --output doxla-dist
+node dist/cli/index.js build --output doxla-dist
 ```
 
 ## Architecture
@@ -49,10 +49,6 @@ Vitest with two environments: `node` for CLI tests, `jsdom` for app component te
 
 - `tests/cli/` — Tests for discover, manifest, build, init.
 - `tests/app/` — Tests for React components (MarkdownRenderer, MdxRenderer, Callout, FileTree, IndexPage).
-
-### Sample Docs (`@sample-docs/`)
-
-Example documentation files used for manual testing. Not included in the npm package.
 
 ## Key Patterns
 
