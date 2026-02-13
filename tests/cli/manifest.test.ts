@@ -56,13 +56,41 @@ describe("generateManifest", () => {
     expect(manifest.docs[0].slug).toBe("docs/api-guide");
   });
 
-  it("includes file content", async () => {
-    const content = "# Hello\n\nWorld!";
+  it("strips leading heading from content", async () => {
+    await writeFile(join(testDir, "test.md"), "# Hello\n\nWorld!");
+
+    const manifest = await generateManifest(testDir, ["test.md"]);
+
+    expect(manifest.docs[0].title).toBe("Hello");
+    expect(manifest.docs[0].content).toBe("World!");
+  });
+
+  it("preserves content when no heading exists", async () => {
+    const content = "Just some content.";
     await writeFile(join(testDir, "test.md"), content);
 
     const manifest = await generateManifest(testDir, ["test.md"]);
 
     expect(manifest.docs[0].content).toBe(content);
+  });
+
+  it("does not strip mid-document heading", async () => {
+    const content = "Intro text.\n\n# Mid Heading\n\nMore content.";
+    await writeFile(join(testDir, "test.md"), content);
+
+    const manifest = await generateManifest(testDir, ["test.md"]);
+
+    expect(manifest.docs[0].title).toBe("Mid Heading");
+    expect(manifest.docs[0].content).toBe(content);
+  });
+
+  it("strips heading preceded by blank lines", async () => {
+    await writeFile(join(testDir, "test.md"), "\n\n# Title\n\nBody here.");
+
+    const manifest = await generateManifest(testDir, ["test.md"]);
+
+    expect(manifest.docs[0].title).toBe("Title");
+    expect(manifest.docs[0].content).toBe("Body here.");
   });
 
   it("creates correct slugs for .mdx files", async () => {
@@ -91,6 +119,15 @@ describe("generateManifest", () => {
     const manifest = await generateManifest(testDir, ["my-guide.mdx"]);
 
     expect(manifest.docs[0].title).toBe("My Guide");
+  });
+
+  it("handles file with only a heading and no content", async () => {
+    await writeFile(join(testDir, "test.md"), "# Only Title");
+
+    const manifest = await generateManifest(testDir, ["test.md"]);
+
+    expect(manifest.docs[0].title).toBe("Only Title");
+    expect(manifest.docs[0].content).toBe("");
   });
 
   it("preserves .mdx path in manifest", async () => {
