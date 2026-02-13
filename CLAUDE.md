@@ -45,7 +45,7 @@ A standalone React + Vite + Tailwind app. Has its own `package.json`. This is th
 
 ### Tests (`tests/`)
 
-Vitest with two environments: `node` for CLI tests, `jsdom` for app component tests (configured via `environmentMatchGlobs` in `vitest.config.ts`).
+Vitest with two environments: `node` for CLI tests, `jsdom` for app component tests (configured via `projects` in `vitest.config.ts`).
 
 - `tests/cli/` — Tests for discover, manifest, build, init.
 - `tests/app/` — Tests for React components (MarkdownRenderer, MdxRenderer, Callout, FileTree, IndexPage).
@@ -68,3 +68,27 @@ Example documentation files used for manual testing. Not included in the npm pac
 - Commit messages follow conventional commits (`feat:`, `fix:`, `ci:`, etc.) for semantic-release.
 - Tests use temp directories with random names for filesystem tests, cleaned up in `afterEach`.
 - React components use Tailwind classes via `clsx`/`tailwind-merge` (utility in `src/app/src/lib/utils.ts`).
+
+## Workflow
+
+We use a pull request based flow. Work on appropriately named branches.
+
+1. **Discovery** — Discover the feature in depth with the user. Consider how it fits in to the overall project. Ask any questions needed, and clarify the user's answers if needed.
+2. **Plan** — Write a comprehensive implementation plan covering:
+   - Feature
+   - Tests
+   - Documentation
+   - Any CI changes
+3. **Plan Review** — Review the plan with appropriate agents, and make any needed changes.
+4. **Implement** — Implement the feature.
+   - Sub agents can be used if required.
+   - For complex features with many stages that can be parallelised, orchestrate an agent team.
+5. **Verify** — Ensure test, lint, and build steps pass.
+6. **Code Review** — Review the changes with code review agent.
+   - If they request changes, make them, then return to step 5.
+   - Maximum 5 review cycles.
+7. **Draft PR** — Open a draft pull request.
+8. **CI Checks** — Ensure all status checks pass on PR. Resolve any failures.
+9. **Ready for Review** — Convert PR to "Ready for Review".
+10. **CoPilot Review** — GitHub CoPilot will now review the PR remotely. Wait for this review, read their comments, and if necessary address them.
+11. **Done** — Once the PR is ready to merge, you are finished, and can report back to the user.
