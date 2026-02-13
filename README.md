@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo.png" alt="Doxla" width="120" />
+</p>
+
 # doxla
 
 Improve documentation discoverability within repos. Doxla discovers all `.md` and `.mdx` files in your repository, builds a beautiful docs viewer, and deploys it to GitHub Pages.
