@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.png" alt="Doxla" width="120" />
+  <img src="https://raw.githubusercontent.com/alsiola/doxla/main/logo.png" alt="Doxla" width="120" />
 </p>
 
 # doxla
