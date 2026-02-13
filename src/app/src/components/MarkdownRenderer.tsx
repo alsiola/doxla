@@ -9,9 +9,33 @@ import type { Theme } from "../App";
 interface MarkdownRendererProps {
   content: string;
   theme: Theme;
+  docPath?: string;
 }
 
-export function MarkdownRenderer({ content, theme }: MarkdownRendererProps) {
+function resolveDocLink(href: string, docPath: string): string | null {
+  if (!href.match(/\.md(#.*)?$/i)) return null;
+  if (/^https?:\/\//.test(href)) return null;
+
+  const [filePart, anchor] = href.split("#");
+  const docDir = docPath.includes("/") ? docPath.replace(/\/[^/]+$/, "") : "";
+  const parts = (docDir ? `${docDir}/${filePart}` : filePart).split("/");
+
+  const resolved: string[] = [];
+  for (const part of parts) {
+    if (part === "..") resolved.pop();
+    else if (part !== ".") resolved.push(part);
+  }
+
+  const slug = resolved
+    .join("/")
+    .replace(/\.md$/i, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9/.-]/g, "-");
+
+  return `#/doc/${slug}${anchor ? `#${anchor}` : ""}`;
+}
+
+export function MarkdownRenderer({ content, theme, docPath }: MarkdownRendererProps) {
   const syntaxStyle = theme === "dark" ? oneDark : oneLight;
 
   const components: Components = useMemo(
@@ -43,8 +67,18 @@ export function MarkdownRenderer({ content, theme }: MarkdownRendererProps) {
           </SyntaxHighlighter>
         );
       },
+      a(props) {
+        const { href, children, ...rest } = props;
+        if (href && docPath) {
+          const resolved = resolveDocLink(href, docPath);
+          if (resolved) {
+            return <a href={resolved} {...rest}>{children}</a>;
+          }
+        }
+        return <a href={href} {...rest}>{children}</a>;
+      },
     }),
-    [syntaxStyle],
+    [syntaxStyle, docPath],
   );
 
   return (

@@ -37,7 +37,7 @@ export function DocPage({ doc, theme }: DocPageProps) {
 
       <Separator className="mb-6" />
 
-      <MarkdownRenderer content={doc.content} theme={theme} />
+      <MarkdownRenderer content={doc.content} theme={theme} docPath={doc.path} />
     </div>
   );
 }

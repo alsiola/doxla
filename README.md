@@ -2,6 +2,16 @@
 
 Improve documentation discoverability within repos. Doxla discovers all `.md` files in your repository, builds a beautiful docs viewer, and deploys it to GitHub Pages.
 
+## Why?
+
+Documentation is most valuable when it lives next to the code it describes — but in-repo markdown has a discoverability problem. Files get buried in directory trees, raw markdown is hard to read in editors, and preview plugins vary by IDE.
+
+Meanwhile, AI coding assistants (Claude Code, Copilot, Cursor) work with what's in the repository. Docs in Notion or Google Docs are invisible to them. In-repo markdown is context they can read and act on.
+
+Doxla bridges the gap: keep your docs as `.md` files in your repo (where both humans and AI agents can find them), and Doxla turns them into a readable, searchable site.
+
+Read the full rationale: [Why Doxla?](RATIONALE.md)
+
 ## Quick Start
 
 ### Deploy to GitHub Pages
