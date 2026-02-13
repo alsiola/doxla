@@ -29,8 +29,11 @@ function getPreview(content: string): string {
       if (previewLines.length > 0) break;
       continue;
     }
-    // Strip HTML tags and skip lines that are only HTML/images
-    const textOnly = trimmed.replace(/<[^>]+>/g, "").trim();
+    // Strip HTML tags, then remove any stray angle brackets left by malformed markup
+    const textOnly = trimmed
+      .replace(/<[^>]+>/g, "")
+      .replace(/[<>]/g, "")
+      .trim();
     if (textOnly === "") continue;
     previewLines.push(textOnly);
   }
