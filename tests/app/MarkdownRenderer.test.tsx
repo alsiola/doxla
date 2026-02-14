@@ -14,6 +14,22 @@ describe("MarkdownRenderer", () => {
     expect(screen.getByText("Some paragraph text.")).toBeTruthy();
   });
 
+  it("renders code blocks without a language as styled blocks", () => {
+    const content = "```\nconst x = 1;\n```";
+    const { container } = render(<MarkdownRenderer theme="light" content={content} />);
+    // Should use SyntaxHighlighter (renders a <div> with PreTag="div"), not inline <code>
+    const inlineCode = container.querySelector("code.rounded");
+    expect(inlineCode).toBeNull();
+    expect(screen.getByText("const x = 1;")).toBeTruthy();
+  });
+
+  it("renders inline code as inline elements", () => {
+    render(<MarkdownRenderer theme="light" content="Use `foo` here" />);
+    const codeEl = screen.getByText("foo");
+    expect(codeEl.tagName).toBe("CODE");
+    expect(codeEl.className).toContain("rounded");
+  });
+
   it("renders links", () => {
     render(<MarkdownRenderer theme="light" content="[Click here](https://example.com)" />);
     const link = screen.getByText("Click here");

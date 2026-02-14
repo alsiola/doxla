@@ -52,6 +52,25 @@ describe("MdxRenderer", () => {
     });
   });
 
+  it("renders code blocks without a language as styled blocks", async () => {
+    const content = "```\nconst x = 1;\n```";
+    const { container } = render(<MdxRenderer theme="light" content={content} />);
+    await waitFor(() => {
+      const inlineCode = container.querySelector("code.rounded");
+      expect(inlineCode).toBeNull();
+      expect(screen.getByText("const x = 1;")).toBeTruthy();
+    });
+  });
+
+  it("renders inline code as inline elements", async () => {
+    render(<MdxRenderer theme="light" content="Use `foo` here" />);
+    await waitFor(() => {
+      const codeEl = screen.getByText("foo");
+      expect(codeEl.tagName).toBe("CODE");
+      expect(codeEl.className).toContain("rounded");
+    });
+  });
+
   it("resolves relative .mdx links to app routes", async () => {
     const content = "[Link](../other.mdx)";
     render(<MdxRenderer theme="light" content={content} docPath="guides/test.mdx" />);

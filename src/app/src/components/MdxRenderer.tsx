@@ -62,7 +62,7 @@ export function MdxRenderer({ content, theme, docPath }: MdxRendererProps) {
     code(props: Record<string, unknown>) {
       const { children, className, ...rest } = props;
       const match = /language-(\w+)/.exec((className as string) || "");
-      const isInline = !match;
+      const isInline = !match && !String(children).endsWith('\n');
 
       if (isInline) {
         return (
@@ -78,7 +78,7 @@ export function MdxRenderer({ content, theme, docPath }: MdxRendererProps) {
       return (
         <SyntaxHighlighter
           style={syntaxStyle}
-          language={match[1]}
+          language={match?.[1] ?? "text"}
           PreTag="div"
           className="rounded-md text-sm"
         >

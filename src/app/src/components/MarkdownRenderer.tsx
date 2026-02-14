@@ -22,7 +22,7 @@ export function MarkdownRenderer({ content, theme, docPath }: MarkdownRendererPr
       code(props) {
         const { children, className, ...rest } = props;
         const match = /language-(\w+)/.exec(className || "");
-        const isInline = !match;
+        const isInline = !match && !String(children).endsWith('\n');
 
         if (isInline) {
           return (
@@ -38,7 +38,7 @@ export function MarkdownRenderer({ content, theme, docPath }: MarkdownRendererPr
         return (
           <SyntaxHighlighter
             style={syntaxStyle}
-            language={match[1]}
+            language={match?.[1] ?? "text"}
             PreTag="div"
             className="rounded-md text-sm"
           >
