@@ -40,7 +40,7 @@ This creates a GitHub Actions workflow that builds and deploys your docs on ever
 
 Install Doxla into any GitHub repository — no local setup required:
 
-**[Kerex it!](https://install.kerex.app/doxla)**
+[![Kerex Install: doxla](https://ready.kerex.app/api/install-badge/doxla)](https://install.kerex.app/doxla)
 
 Paste your repo URL and Kerex will open a pull request with the Doxla workflow and config. Works with public and private repositories.
 
